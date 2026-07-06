@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 일정 관리 - Notion 연동</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 채팅 일정 관리</h1>
+            <p class="subtitle">채팅으로 일정을 등록하면 자동으로 Notion에 저장됩니다</p>
+        </header>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message bot">
+                    <div class="message-content">
+                        <p>안녕하세요! 일정을 등록하려면 다음과 같이 입력해주세요:</p>
+                        <ul>
+                            <li>"내일 오후 3시 회의"</li>
+                            <li>"2026년 7월 5일 오전 10시 프로젝트 발표"</li>
+                            <li>"다음주 월요일 저녁 7시 저녁 약속"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="일정을 입력하세요... (예: 내일 오후 3시 회의)"
+                    autocomplete="off"
+                >
+                <button id="sendButton">전송</button>
+            </div>
+        </div>
+
+        <div class="settings-panel">
+            <h3>⚙️ Notion 설정</h3>
+            <div class="setting-item">
+                <label for="notionToken">Notion Integration Token:</label>
+                <input 
+                    type="password" 
+                    id="notionToken" 
+                    placeholder="secret_..."
+                >
+            </div>
+            <div class="setting-item">
+                <label for="databaseId">Database ID:</label>
+                <input 
+                    type="text" 
+                    id="databaseId" 
+                    placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                >
+            </div>
+            <button id="saveSettings">설정 저장</button>
+            <p class="settings-note">
+                💡 <a href="#" id="helpLink">Notion 설정 방법 보기</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Notion 설정 방법</h2>
+            <ol>
+                <li>
+                    <strong>Notion Integration 생성:</strong>
+                    <ul>
+                        <li><a href="https://www.notion.so/my-integrations" target="_blank">Notion Integrations 페이지</a>로 이동</li>
+                        <li>"New integration" 클릭</li>
+                        <li>이름 입력 후 "Submit" 클릭</li>
+                        <li>생성된 "Internal Integration Token" 복사</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>데이터베이스 생성 및 연결:</strong>
+                    <ul>
+                        <li>Notion에서 새 페이지 생성</li>
+                        <li>"/database" 입력 후 "Table - Inline" 선택</li>
+                        <li>다음 속성 추가:
+                            <ul>
+                                <li>제목 (Title)</li>
+                                <li>날짜 (Date)</li>
+                                <li>시간 (Text)</li>
+                                <li>설명 (Text)</li>
+                            </ul>
+                        </li>
+                        <li>페이지 우측 상단 "..." → "Add connections" → 생성한 Integration 선택</li>
+                        <li>페이지 URL에서 Database ID 복사 (예: notion.so/xxxxxxxx...)</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>설정 입력:</strong>
+                    <ul>
+                        <li>복사한 Token과 Database ID를 위 설정 패널에 입력</li>
+                        <li>"설정 저장" 클릭</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
