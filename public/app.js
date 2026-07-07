@@ -193,6 +193,9 @@ class NotionClient {
         const url = `${this.apiUrl}/pages`;
 
         try {
+            console.log('Sending request to:', url);
+            console.log('Request body:', { token: '***', databaseId: this.databaseId, schedule });
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -205,13 +208,26 @@ class NotionClient {
                 })
             });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Notion API 오류');
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers.get('content-type'));
+
+            // Content-Type 확인
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Non-JSON response:', text.substring(0, 200));
+                throw new Error('서버가 JSON이 아닌 응답을 반환했습니다. 서버를 재시작해주세요.');
             }
 
-            return await response.json();
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Notion API 오류');
+            }
+
+            return data;
         } catch (error) {
+            console.error('Notion API Error:', error);
             throw new Error(`Notion 연동 실패: ${error.message}`);
         }
     }
