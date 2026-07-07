@@ -183,64 +183,31 @@ class NotionClient {
     constructor(token, databaseId) {
         this.token = token;
         this.databaseId = databaseId;
-        this.apiUrl = 'https://api.notion.com/v1';
+        // 로컬 개발 환경과 프로덕션 환경 구분
+        this.apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3000/api/notion'
+            : '/api/notion';
     }
 
     async createPage(schedule) {
         const url = `${this.apiUrl}/pages`;
-        
-        const body = {
-            parent: { database_id: this.databaseId },
-            properties: {
-                '제목': {
-                    title: [
-                        {
-                            text: {
-                                content: schedule.title
-                            }
-                        }
-                    ]
-                },
-                '날짜': {
-                    date: {
-                        start: schedule.date
-                    }
-                },
-                '시간': {
-                    rich_text: [
-                        {
-                            text: {
-                                content: schedule.time || '시간 미정'
-                            }
-                        }
-                    ]
-                },
-                '설명': {
-                    rich_text: [
-                        {
-                            text: {
-                                content: schedule.description
-                            }
-                        }
-                    ]
-                }
-            }
-        };
 
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json',
-                    'Notion-Version': '2022-06-28'
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify({
+                    token: this.token,
+                    databaseId: this.databaseId,
+                    schedule: schedule
+                })
             });
 
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Notion API 오류');
+                throw new Error(error.error || 'Notion API 오류');
             }
 
             return await response.json();

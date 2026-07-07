@@ -2,10 +2,10 @@
   "name": "chat-notion-scheduler",
   "version": "1.0.0",
   "description": "채팅으로 일정을 등록하면 자동으로 Notion에 저장되는 웹 애플리케이션",
-  "main": "public/index.html",
+  "main": "server.js",
   "scripts": {
-    "start": "npx http-server public -p 3000 -o",
-    "dev": "npx http-server public -p 3000 -o"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [
     "notion",
@@ -16,7 +16,8 @@
   ],
   "author": "",
   "license": "MIT",
-  "devDependencies": {
-    "http-server": "^14.1.1"
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   }
 }
