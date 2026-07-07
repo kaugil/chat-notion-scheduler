@@ -1,15 +1,21 @@
 // 설정 관리
 class SettingsManager {
     constructor() {
+        // 기본 설정값
+        this.defaultSettings = {
+            notionToken: 'ntn_X30029019488EbyrCuWlRJguEtjx5d3pNctxkoKIk8JeTq',
+            databaseId: '3960b2fca5bc8097b560ea9dde3adb0f'
+        };
         this.settings = this.loadSettings();
     }
 
     loadSettings() {
         const saved = localStorage.getItem('notionSettings');
-        return saved ? JSON.parse(saved) : {
-            notionToken: '',
-            databaseId: ''
-        };
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        // 저장된 설정이 없으면 기본값 사용
+        return { ...this.defaultSettings };
     }
 
     saveSettings(token, databaseId) {
@@ -19,6 +25,11 @@ class SettingsManager {
 
     isConfigured() {
         return this.settings.notionToken && this.settings.databaseId;
+    }
+
+    isUsingDefault() {
+        return this.settings.notionToken === this.defaultSettings.notionToken &&
+               this.settings.databaseId === this.defaultSettings.databaseId;
     }
 }
 
@@ -251,6 +262,11 @@ class ChatUI {
         const settings = this.settingsManager.settings;
         document.getElementById('notionToken').value = settings.notionToken;
         document.getElementById('databaseId').value = settings.databaseId;
+        
+        // 기본 설정 사용 중이면 안내 메시지 표시
+        if (this.settingsManager.isUsingDefault()) {
+            this.addMessage('bot', '✅ 기본 Notion 설정이 적용되었습니다. 바로 사용하실 수 있습니다!<br>다른 Notion 계정을 사용하시려면 아래 설정을 변경해주세요.');
+        }
     }
 
     attachEventListeners() {
