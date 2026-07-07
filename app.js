@@ -270,6 +270,15 @@ class ChatUI {
     }
 
     attachEventListeners() {
+        // 설정 패널 토글
+        const settingsHeader = document.getElementById('settingsHeader');
+        const settingsContent = document.getElementById('settingsContent');
+        
+        settingsHeader.addEventListener('click', () => {
+            settingsHeader.classList.toggle('collapsed');
+            settingsContent.classList.toggle('collapsed');
+        });
+
         // 메시지 전송
         this.sendButton.addEventListener('click', () => this.handleSendMessage());
         this.messageInput.addEventListener('keypress', (e) => {

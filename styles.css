@@ -160,14 +160,52 @@ header h1 {
 .settings-panel {
     background: white;
     border-radius: 20px;
-    padding: 25px;
+    padding: 0;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 }
 
-.settings-panel h3 {
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s;
+}
+
+.settings-header:hover {
+    background-color: #f8f9fa;
+}
+
+.settings-header h3 {
     color: #333;
-    margin-bottom: 20px;
     font-size: 1.3rem;
+    margin: 0;
+}
+
+.toggle-icon {
+    font-size: 1.2rem;
+    color: #667eea;
+    transition: transform 0.3s;
+}
+
+.settings-header.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.settings-content {
+    padding: 0 25px 25px 25px;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.settings-content.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .setting-item {
