@@ -2,6 +2,17 @@
 
 채팅으로 일정을 등록하면 자동으로 Notion에 저장되는 웹 애플리케이션입니다.
 
+## 🌐 온라인 데모
+
+**GitHub Pages에서 바로 사용해보세요!**
+
+배포 후 다음 URL에서 접속 가능합니다:
+```
+https://YOUR_USERNAME.github.io/chat-notion-scheduler/
+```
+
+> 💡 **모바일에서도 사용 가능**: 위 URL을 모바일 브라우저에서 열면 반응형 디자인으로 최적화된 화면을 볼 수 있습니다.
+
 ## ✨ 주요 기능
 
 - 💬 **자연어 일정 입력**: "내일 오후 3시 회의"처럼 자연스럽게 입력
@@ -12,14 +23,22 @@
 
 ## 🚀 빠른 시작
 
-### 1. 프로젝트 설치
+### 방법 1: 온라인에서 바로 사용 (권장)
+
+1. GitHub Pages에 배포된 URL 접속
+2. 아래 Notion 설정 완료
+3. 바로 사용 시작!
+
+### 방법 2: 로컬에서 실행
+
+#### 1. 프로젝트 설치
 
 ```bash
 cd chat-notion-scheduler
 npm install
 ```
 
-### 2. 서버 실행
+#### 2. 서버 실행
 
 ```bash
 npm start
@@ -27,7 +46,7 @@ npm start
 
 브라우저가 자동으로 열리며 `http://localhost:3000`에서 앱이 실행됩니다.
 
-### 3. Notion 설정
+### Notion 설정
 
 1. **Notion Integration 생성**
    - [Notion Integrations 페이지](https://www.notion.so/my-integrations) 방문
@@ -52,6 +71,30 @@ npm start
 4. **앱에서 설정**
    - 앱의 설정 패널에 Token과 Database ID 입력
    - "설정 저장" 클릭
+
+## 🚀 GitHub Pages 배포
+
+자신의 GitHub Pages에 배포하려면 [DEPLOYMENT.md](DEPLOYMENT.md) 문서를 참조하세요.
+
+**간단 배포 가이드:**
+
+```bash
+# 1. Git 저장소 초기화 (이미 완료됨)
+git init
+git add .
+git commit -m "Initial commit"
+
+# 2. GitHub 저장소 생성 후 연결
+git remote add origin https://github.com/YOUR_USERNAME/chat-notion-scheduler.git
+git branch -M main
+git push -u origin main
+
+# 3. GitHub 저장소 Settings → Pages → Source를 "GitHub Actions"로 설정
+```
+
+배포 후 `https://YOUR_USERNAME.github.io/chat-notion-scheduler/`에서 접속 가능합니다.
+
+자세한 내용은 [DEPLOYMENT.md](DEPLOYMENT.md)를 참조하세요.
 
 ## 📖 사용 방법
 
