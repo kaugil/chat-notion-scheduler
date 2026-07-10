@@ -20,12 +20,60 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { token, databaseId, schedule } = req.body;
+        const { token, databaseId, schedule, recipientEmail } = req.body;
 
         if (!token || !databaseId || !schedule) {
-            return res.status(400).json({ 
-                error: 'Missing required fields: token, databaseId, or schedule' 
+            return res.status(400).json({
+                error: 'Missing required fields: token, databaseId, or schedule'
             });
+        }
+
+        // Notion 속성 구성
+        const properties = {
+            '제목': {
+                title: [
+                    {
+                        text: {
+                            content: schedule.title
+                        }
+                    }
+                ]
+            },
+            '날짜': {
+                date: {
+                    start: schedule.date
+                }
+            },
+            '시간': {
+                rich_text: [
+                    {
+                        text: {
+                            content: schedule.time || '시간 미정'
+                        }
+                    }
+                ]
+            },
+            '설명': {
+                rich_text: [
+                    {
+                        text: {
+                            content: schedule.description
+                        }
+                    }
+                ]
+            }
+        };
+
+        // 이메일 주소가 제공된 경우 추가 (Notion 자동화용)
+        if (recipientEmail) {
+            properties['이메일'] = {
+                email: recipientEmail
+            };
+            properties['알림상태'] = {
+                select: {
+                    name: '대기중'
+                }
+            };
         }
 
         const notionResponse = await fetch('https://api.notion.com/v1/pages', {
@@ -37,40 +85,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 parent: { database_id: databaseId },
-                properties: {
-                    '제목': {
-                        title: [
-                            {
-                                text: {
-                                    content: schedule.title
-                                }
-                            }
-                        ]
-                    },
-                    '날짜': {
-                        date: {
-                            start: schedule.date
-                        }
-                    },
-                    '시간': {
-                        rich_text: [
-                            {
-                                text: {
-                                    content: schedule.time || '시간 미정'
-                                }
-                            }
-                        ]
-                    },
-                    '설명': {
-                        rich_text: [
-                            {
-                                text: {
-                                    content: schedule.description
-                                }
-                            }
-                        ]
-                    }
-                }
+                properties: properties
             })
         });
 
