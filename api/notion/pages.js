@@ -64,11 +64,32 @@ export default async function handler(req, res) {
             }
         };
 
-        // 이메일 주소가 제공된 경우 추가 (Notion 자동화용)
-        if (recipientEmail) {
+        // 먼저 데이터베이스 스키마 확인
+        const dbResponse = await fetch(`https://api.notion.com/v1/databases/${databaseId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Notion-Version': '2022-06-28'
+            }
+        });
+
+        let hasEmailProperty = false;
+        let hasStatusProperty = false;
+
+        if (dbResponse.ok) {
+            const dbData = await dbResponse.json();
+            hasEmailProperty = dbData.properties && dbData.properties['이메일'];
+            hasStatusProperty = dbData.properties && dbData.properties['알림상태'];
+        }
+
+        // 이메일 주소가 제공되고 속성이 존재하는 경우에만 추가
+        if (recipientEmail && hasEmailProperty) {
             properties['이메일'] = {
                 email: recipientEmail
             };
+        }
+
+        if (recipientEmail && hasStatusProperty) {
             properties['알림상태'] = {
                 select: {
                     name: '대기중'
