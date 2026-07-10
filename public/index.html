@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>채팅 일정 관리 - Notion 연동</title>
+    <title>채팅 일정 관리 - Notion & Outlook 연동</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📅 채팅 일정 관리</h1>
-            <p class="subtitle">채팅으로 일정을 등록하면 자동으로 Notion에 저장됩니다</p>
+            <p class="subtitle">채팅으로 일정을 등록하면 자동으로 Notion과 Outlook에 저장됩니다</p>
         </header>
 
         <div class="chat-container">
@@ -28,10 +28,18 @@
             </div>
 
             <div class="input-container">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="일정을 입력하세요... (예: 내일 오후 3시 회의)"
+                <button id="voiceButton" class="voice-button" title="음성 입력">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="일정을 입력하세요... (예: 내일 오후 3시 회의) 또는 🎤 버튼을 눌러 음성으로 입력"
                     autocomplete="off"
                 >
                 <button id="sendButton">전송</button>
@@ -40,29 +48,60 @@
 
         <div class="settings-panel">
             <div class="settings-header collapsed" id="settingsHeader">
-                <h3>⚙️ Notion 설정</h3>
+                <h3>⚙️ 설정</h3>
                 <span class="toggle-icon">▼</span>
             </div>
             <div class="settings-content collapsed" id="settingsContent">
-            <div class="setting-item">
-                <label for="notionToken">Notion Integration Token:</label>
-                <input 
-                    type="password" 
-                    id="notionToken" 
-                    placeholder="secret_..."
-                >
+            
+            <!-- Notion 설정 -->
+            <div class="settings-section">
+                <h4>📝 Notion 설정</h4>
+                <div class="setting-item">
+                    <label for="notionToken">Notion Integration Token:</label>
+                    <input 
+                        type="password" 
+                        id="notionToken" 
+                        placeholder="secret_..."
+                    >
+                </div>
+                <div class="setting-item">
+                    <label for="databaseId">Database ID:</label>
+                    <input 
+                        type="text" 
+                        id="databaseId" 
+                        placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    >
+                </div>
             </div>
-            <div class="setting-item">
-                <label for="databaseId">Database ID:</label>
-                <input 
-                    type="text" 
-                    id="databaseId" 
-                    placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                >
+
+            <!-- Outlook 설정 -->
+            <div class="settings-section">
+                <h4>📧 Outlook 설정</h4>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enableOutlook">
+                        Outlook 이메일 발송 활성화
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label for="recipientEmail">알림 받을 이메일:</label>
+                    <input 
+                        type="email" 
+                        id="recipientEmail" 
+                        placeholder="your-email@company.com"
+                    >
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enableReminder" checked>
+                        D-1 알림 자동 발송
+                    </label>
+                </div>
             </div>
+
             <button id="saveSettings">설정 저장</button>
             <p class="settings-note">
-                💡 <a href="#" id="helpLink">Notion 설정 방법 보기</a>
+                💡 <a href="#" id="helpLink">설정 방법 보기</a>
             </p>
             </div>
         </div>
@@ -71,7 +110,9 @@
     <div id="helpModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Notion 설정 방법</h2>
+            <h2>설정 방법</h2>
+            
+            <h3>📝 Notion 설정</h3>
             <ol>
                 <li>
                     <strong>Notion Integration 생성:</strong>
@@ -99,11 +140,23 @@
                         <li>페이지 URL에서 Database ID 복사 (예: notion.so/xxxxxxxx...)</li>
                     </ul>
                 </li>
+            </ol>
+
+            <h3>📧 Outlook 설정</h3>
+            <ol>
                 <li>
-                    <strong>설정 입력:</strong>
+                    <strong>MCP 서버 설정 필요:</strong>
                     <ul>
-                        <li>복사한 Token과 Database ID를 위 설정 패널에 입력</li>
-                        <li>"설정 저장" 클릭</li>
+                        <li>Outlook 연동은 MCP(Model Context Protocol) 서버를 통해 작동합니다</li>
+                        <li>서버 관리자에게 Microsoft 365 앱 등록 및 MCP 서버 설정을 요청하세요</li>
+                        <li>자세한 내용은 <code>/Users/ygkwon/Documents/IBM Bob/MCP/outlook-server/README.md</code> 참조</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>이메일 주소 입력:</strong>
+                    <ul>
+                        <li>알림을 받을 회사 이메일 주소를 입력하세요</li>
+                        <li>D-1 알림을 활성화하면 일정 하루 전 오전 9시에 자동으로 이메일이 발송됩니다</li>
                     </ul>
                 </li>
             </ol>
