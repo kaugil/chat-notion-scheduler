@@ -207,50 +207,112 @@ class NotionClient {
     constructor(token, databaseId) {
         this.token = token;
         this.databaseId = databaseId;
-        // 로컬 개발 환경과 프로덕션 환경 구분
-        this.apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:3000/api/notion'
-            : '/api/notion';
     }
 
     async createPage(schedule, recipientEmail = null) {
-        const url = `${this.apiUrl}/pages`;
-
         try {
-            console.log('Sending request to:', url);
-            console.log('Request body:', { token: '***', databaseId: this.databaseId, schedule, recipientEmail: recipientEmail ? '***' : null });
+            console.log('Creating Notion page...');
+            console.log('Schedule:', schedule);
+            console.log('Recipient email:', recipientEmail ? '***' : null);
 
-            const response = await fetch(url, {
+            // 먼저 데이터베이스 스키마 확인
+            const dbResponse = await fetch(`https://api.notion.com/v1/databases/${this.databaseId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Notion-Version': '2022-06-28'
+                }
+            });
+
+            let hasEmailProperty = false;
+            let hasStatusProperty = false;
+
+            if (dbResponse.ok) {
+                const dbData = await dbResponse.json();
+                hasEmailProperty = dbData.properties && dbData.properties['이메일'];
+                hasStatusProperty = dbData.properties && dbData.properties['알림상태'];
+                console.log('Database properties:', {
+                    hasEmailProperty,
+                    hasStatusProperty
+                });
+            }
+
+            // Notion 속성 구성
+            const properties = {
+                '제목': {
+                    title: [
+                        {
+                            text: {
+                                content: schedule.title
+                            }
+                        }
+                    ]
+                },
+                '날짜': {
+                    date: {
+                        start: schedule.date
+                    }
+                },
+                '시간': {
+                    rich_text: [
+                        {
+                            text: {
+                                content: schedule.time || '시간 미정'
+                            }
+                        }
+                    ]
+                },
+                '설명': {
+                    rich_text: [
+                        {
+                            text: {
+                                content: schedule.description
+                            }
+                        }
+                    ]
+                }
+            };
+
+            // 이메일 주소가 제공되고 속성이 존재하는 경우에만 추가
+            if (recipientEmail && hasEmailProperty) {
+                properties['이메일'] = {
+                    email: recipientEmail
+                };
+            }
+
+            if (recipientEmail && hasStatusProperty) {
+                properties['알림상태'] = {
+                    select: {
+                        name: '대기중'
+                    }
+                };
+            }
+
+            const response = await fetch('https://api.notion.com/v1/pages', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                    'Notion-Version': '2022-06-28'
                 },
                 body: JSON.stringify({
-                    token: this.token,
-                    databaseId: this.databaseId,
-                    schedule: schedule,
-                    recipientEmail: recipientEmail
+                    parent: { database_id: this.databaseId },
+                    properties: properties
                 })
             });
 
             console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers.get('content-type'));
 
-            // Content-Type 확인
-            const contentType = response.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                const text = await response.text();
-                console.error('Non-JSON response:', text.substring(0, 200));
-                throw new Error('서버가 JSON이 아닌 응답을 반환했습니다. 서버를 재시작해주세요.');
+            if (!response.ok) {
+                const error = await response.json();
+                console.error('Notion API error:', error);
+                throw new Error(error.message || 'Notion API 오류');
             }
 
             const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Notion API 오류');
-            }
-
+            console.log('Page created successfully');
             return data;
+
         } catch (error) {
             console.error('Notion API Error:', error);
             throw new Error(`Notion 연동 실패: ${error.message}`);
